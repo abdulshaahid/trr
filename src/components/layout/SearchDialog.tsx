@@ -1,6 +1,6 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const suggestions = [
   "Popular destinations",
@@ -13,12 +13,35 @@ const suggestions = [
 
 export function SearchDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const [focused, setFocused] = useState(false);
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const isKeyboardOpen = window.innerHeight < window.screen.height * 0.8;
+      setKeyboardOpen(isKeyboardOpen);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] p-0 gap-0 bg-[#121212] border-none rounded-3xl overflow-hidden">
+      <DialogContent
+        className="sm:max-w-[600px] p-0 gap-0 bg-[#121212] border-none rounded-3xl overflow-hidden"
+        style={{
+          position: "fixed",
+          top: keyboardOpen ? "5%" : "10%", // Adjust dynamically
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}
+      >
         <div className="p-4">
-          <div className={`flex items-center gap-3 bg-black rounded-2xl p-4 transition-all ${focused ? 'ring-2 ring-[#37e5a5]' : 'ring-1 ring-white/10'}`}>
+          <div
+            className={`flex items-center gap-3 bg-black rounded-2xl p-4 transition-all ${
+              focused ? "ring-2 ring-[#37e5a5]" : "ring-1 ring-white/10"
+            }`}
+          >
             <Search className="w-5 h-5 text-white/60" />
             <input
               className="bg-transparent text-white placeholder:text-white/60 flex-1 outline-none"
